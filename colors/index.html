@@ -1,0 +1,278 @@
+<!-- 
+    The goal is to create a grid of colored boxes that form a gradient. Moving these boxes (by
+    switching positions) forms a game.
+
+    Needs:
+    -DONE- Draw a series of boxes that form the "playing field"
+    -DONE- Calculate a gradient between fixed colors
+    -DONE- "scramble" the boxes
+    -DONE- Make the boxes selectable and then switchable
+    -DONE- Check that all boxes are in the correct spot
+
+    Nexts:
+    -DONE- Align "gameboard"
+    -DONE- Align text better
+
+    Nices:
+    -DONE- Boxes are dynamic to screen size
+    - If it looks like the boxes are animated when switching places
+    - User selects grid dimensions
+    - User selects fixed colors
+    - Nicer looking gradients (maybe not RGB?)
+    -DONE- Count number of moves
+
+    Stretch:
+    - Boxes resize as window resizes
+    - Different shapes (not rectangular)
+    - Login, "levels", etc.
+    - Pseudo multiplayer
+    - Count theoretical best moves
+-->
+
+
+<html>
+    <body>
+        <!--<link rel="stylesheet" type="text/css" href="style.css" /> -->
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Ubuntu&family=Goldman&display=swap" rel="stylesheet">
+        <style>
+            html {
+                background: #f0f0f0;
+            }
+            .start-text {
+                font-size: 2.5em;
+                font-weight: 600;
+                color: #1c2e34;
+                font-family: 'Goldman', sans-serif;
+            }
+        </style>
+        <script>
+            // instead of a fixed size, let's find the largest reasonable square
+            let gridWidth = 5;
+            let gridHeight = 6;
+            let gridNumBoxes = gridWidth * gridHeight;
+
+            let windowWidth = window.innerWidth;
+            let windowHeight = window.innerHeight;
+            let decidingDim = parseInt(Math.min((window.innerWidth-20)/gridWidth,(window.innerHeight-120)/gridHeight));
+            let boxWidth = decidingDim;
+            let boxHeight = decidingDim;
+
+            let leftMargin = Math.max(10,(windowWidth-gridWidth*boxWidth)/2);
+
+            let boxIDint = 0;
+            var selectedBox;
+            var selectedBoxID;
+            var movesCount = 0;
+
+
+    // 2D Approximate colors, going from red to blue
+    // CORNER COLORS (top left, top right, bottom left, bottom right)
+    let corners = [[232,84,64], [28,46,52], [238,255,127], [0,195,229]];
+
+function getColor(x,y){
+    // we know the four corner colors. How far are we in each direction?
+    // get the distance from each point
+    let distances = [];
+    distances.push(Math.sqrt(x*x+y*y));
+    distances.push(Math.sqrt((gridWidth-1-x)*(gridWidth-1-x) + y *y));
+    distances.push(Math.sqrt(x*x + (gridHeight-1-y)*(gridHeight-1-y)));
+    distances.push(Math.sqrt((gridWidth-1-x)*(gridWidth-1-x)+(gridHeight-1-y)*(gridHeight-1-y)));
+
+    // now that we have the distance, we need the inverse distance to weight it appropriately
+    let invDistances = distances.map(x => 1/(x+.00001));
+
+    
+    // normalize distances, so get the sum
+    let reducer = (accumulator, currentValue) => accumulator + currentValue;
+    let sumInvDistances = invDistances.reduce(reducer);
+    let nomInvDistance = invDistances.map(x => x/sumInvDistances);
+
+    // calculate the Red, Green, and Blue values for each box weighted by the normalize inverse distance
+    let resultColor = [];
+    for(let color = 0;color < 3; color++){
+        let colorComponent = 0;
+        colorComponent += corners[0][color] * nomInvDistance[0];
+        colorComponent += corners[1][color] * nomInvDistance[1];
+        colorComponent += corners[2][color] * nomInvDistance[2];
+        colorComponent += corners[3][color] * nomInvDistance[3];
+        resultColor.push(parseInt(colorComponent));
+    }
+    
+    let hexResult = resultColor.map((value) => {
+        newValue = value.toString(16);
+        if (newValue.length === 1){
+            newValue = "0" + newValue;
+        }
+        return newValue;
+
+    })
+    // debug color:
+    console.log("X,Y "+ x + "," + y);
+    console.log("Distances" + distances);
+    console.log("Nom. Inv. Distance: " + nomInvDistance);
+    console.log("Corners: " + corners);
+    console.log("Result color: " + resultColor);
+    console.log("Hex color: " + hexResult);
+
+   // console.log(hexResult);
+    let hexColor = "#" + hexResult[0] + hexResult[1] + hexResult[2];
+    console.log(hexColor)
+    return hexColor;
+}
+
+
+const clickSwitch = function(boxClicked) {
+
+    if (boxClicked == selectedBoxID){
+    // unselect if you click the same one twice
+    selectedBox = document.getElementById('box-'+ boxClicked);
+    selectedBox.style.height = boxHeight;
+    selectedBox.style.width = boxWidth;
+    selectedBox.style.zIndex = 2;
+    selectedBoxID = null;
+    }
+    else if (!(selectedBoxID == null) && boxClicked >=4){
+        // if one is selected, and you click a non-corner box, swap colors
+        movesCount += 1;
+        let tempColor;
+        let tempID;
+        newSelectBox = document.getElementById('box-'+boxClicked);
+        oldSelectBox = document.getElementById('box-'+selectedBoxID);
+        tempColor = oldSelectBox.style.backgroundColor;
+        oldSelectBox.style.backgroundColor = newSelectBox.style.backgroundColor;
+        newSelectBox.style.backgroundColor = tempColor;
+        selectedBoxID = null;
+
+        // reset old selected box
+        oldSelectBox.style.height = boxHeight;
+        oldSelectBox.style.width = boxWidth;
+        oldSelectBox.style.zIndex = 2;
+        if(checkAllColors()){
+            solvedDiv.innerHTML = "Congratulations! You solved it in " + movesCount + " moves!";
+        }
+        else {
+            solvedDiv.innerHTML = "Moves: " + movesCount;
+        }
+
+    }
+    else if (boxClicked >=4) {
+    // Only "select" the box if it's not a corner
+    selectedBox = document.getElementById('box-'+ boxClicked);
+    selectedBox.style.height = boxHeight *1.2;
+    selectedBox.style.width = boxWidth *1.2;
+    selectedBox.style.zIndex = 3;
+    selectedBoxID = boxClicked;
+    }
+    else {
+    // Do nothing. Show you're doing nothing.
+    }
+    return true
+}
+
+function makeBox(xcoord, ycoord, color) {
+ //               console.log("Making a box");
+  box = document.createElement("div");
+  box.style.backgroundColor = color;
+  box.className = "box";
+  box.setAttribute('id','box-'+boxIDint)
+  boxIDint += 1;
+  box.style.height = boxHeight;
+  box.style.width = boxWidth;
+  box.style.zIndex = 2;
+  box.style.top = ycoord;
+  box.style.left = xcoord;
+  box.style.position = "absolute";
+  //box.onclick = clickSwitch();
+  box.setAttribute("onclick","clickSwitch(" + (boxIDint - 1) + ")");
+  document.body.appendChild(box);
+}
+
+function chooseColor(remainingArray){
+    // select index at random
+    let colorIndex = parseInt(Math.random()*remainingArray.length);
+    let returnValue = remainingArray[colorIndex];
+    remainingArray.splice(colorIndex,1);
+    return returnValue;
+}
+
+function checkAllColors(){
+    // the corners are the first 4 boxes created, so their colors aren't in the correct order
+    // we can start checking at index 4 and compare to correctColors AFTER corners removed
+    let correctColorsNoCorners = [];
+    correctColors.forEach(e => correctColorsNoCorners.push(e));
+    correctColorsNoCorners.splice(gridNumBoxes-1,1);
+    correctColorsNoCorners.splice(gridNumBoxes-gridHeight,1);
+    correctColorsNoCorners.splice(gridWidth-1,1);
+    correctColorsNoCorners.splice(0,1);
+    console.log("NC",correctColorsNoCorners);
+    let allOK = true;
+    for (let i=4; i<gridNumBoxes; i++){
+        box = document.getElementById('box-' + i);
+        boxColor = box.style.backgroundColor;
+        const rgba2hex = (rgba) => `#${rgba.match(/^rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+\.{0,1}\d*))?\)$/).slice(1).map((n, i) => (i === 3 ? Math.round(parseFloat(n) * 255) : parseFloat(n)).toString(16).padStart(2, '0').replace('NaN', '')).join('')}`
+        // conversion from StackOverflow: https://stackoverflow.com/questions/1740700/how-to-get-hex-color-value-rather-than-rgb-value
+        boxColor = rgba2hex(boxColor);
+        console.log(boxColor);
+
+        console.log("Box " + i + ": " + boxColor + ", " + correctColorsNoCorners[i-4])
+        if(!(boxColor === correctColorsNoCorners[i-4])){
+            allOK = false;
+            break;
+        }
+    }
+    return allOK;
+}
+
+let correctColors = [];
+let correctColorsCopy = [];
+
+    for(let i =0; i < gridWidth; i++){
+        for(let j=0;j<gridHeight;j++){
+            correctColors.push(getColor(i,j));
+        //makeBox(10 + i * boxWidth , 10+ j * boxHeight , getColor(i,j));
+    }
+    }
+// Copy the correctColors array (by value) then remove the corners
+    correctColors.forEach(e => correctColorsCopy.push(e));
+    correctColorsCopy.splice(gridNumBoxes-1,1);
+    correctColorsCopy.splice(gridNumBoxes-gridHeight,1);
+    correctColorsCopy.splice(gridWidth-1,1);
+    correctColorsCopy.splice(0,1);
+
+    // Position the corners, then fill in the rest
+
+    makeBox(leftMargin + 0 , 10+ 0 , correctColors[0]);
+    makeBox(leftMargin + (gridWidth-1) * boxWidth , 10 + 0 , correctColors[gridNumBoxes-gridHeight]);
+    makeBox(leftMargin + 0, 10+ (gridHeight-1) * boxHeight , correctColors[gridHeight-1]);
+    makeBox(leftMargin + (gridWidth-1) * boxWidth , 10+ (gridHeight-1) * boxHeight , correctColors[gridNumBoxes-1]);
+
+    for(let i =0; i < gridWidth; i++){
+        for(let j=0;j<gridHeight;j++){
+        //    correctColors.push(getColor(i,j));
+        // use the correct color if it's a corner, otherwise, random
+        if (!((i == 0 && j == 0) || (i==0 && j == gridHeight-1) || (i == gridWidth-1 && j ==0 ) || (i == gridWidth-1 && j== gridHeight-1))){
+        makeBox(leftMargin + i * boxWidth , 10+ j * boxHeight , chooseColor(correctColorsCopy));
+        }
+    }
+    }
+
+// Create a div to store puzzle status
+    solvedDiv = document.createElement("div");
+    solvedDiv.className = "start-text";
+  solvedDiv.setAttribute('id','solved');
+  solvedDiv.style.position = "absolute";
+  solvedDiv.style.top = gridHeight*boxHeight+20;
+  solvedDiv.style.left = leftMargin;
+  solvedDiv.style.width = gridWidth * boxWidth;
+  solvedDiv.style.textAlign = "center";
+  solvedDiv.innerHTML = "Click to swap tiles"
+  document.body.appendChild(solvedDiv);
+
+
+
+        </script>
+    </body>
+
+</html>
