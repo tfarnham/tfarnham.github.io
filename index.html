@@ -12,15 +12,6 @@
 
 <link href="styles.css" rel="stylesheet">
 
-<style>
-  .gridcontainer {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto;
-    column-gap: 1em;
-  }
-</style>
-    
   </head>
   <body>
     
@@ -68,11 +59,13 @@
         <p class="col-md-8 fs-4">I'm experienced on a LAMP stack, and am currently working towards familiarity with MERN. Please feel free to read: <a class="biolink" href="about-me.html">more bio</a>, <a class="biolink" href="https://github.com/tfarnham">GitHub @tfarnham</a>, <a class="biolink" href="https://scholar.google.com/citations?user=-Oxh5MsAAAAJ&hl=en&oi=ao">my Google Scholar</a>, <a class="biolink" href="https://www.linkedin.com/in/taylor-farnham-a3342b35/">my LinkedIn</a>, or check out some projects below!</p>
       </div>
     </div>
-    <div class="gridcontainer">
+    <div class="container py-5 gridcontainer">
       <div class="grid-item"><img src="bio-cropped.jpg" alt="Profile picture of me in front of a waterfall"></div>
-      <div class="grid-item">2
+      <div class="grid-item">
       <iframe width="560" height="315" src="https://www.youtube.com/embed/CQeYvWkKG0k" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
+        <div class="grid-item gridcaption">Me in front of a waterfall</div>
+        <div class="grid-item gridcaption">Me in front of a camera</div>
     </div>
 <br>
 <a id="bus-tracking"></a>
@@ -104,7 +97,7 @@
         <div class="h-100 p-5 bg-light border rounded-3">
           <h2>Cursor-Tracking Visualization</h2>
           <p>Gives your page two eyes that always point toward the cursor on screen</p>
-          <p>Simple Javascript reports the cursor position while CSS uses a stack (through z-index) of primitive shapes to create pupils within eyes</p>
+          <p>Simple Javascript reports the cursor position while CSS uses a stack (through z-index) of primitive shapes to create pupils within eyes.</p>
           <a class="btn btn-outline-secondary btmargin" href="https://github.com/tfarnham/cursor-tracking" target="_blank">View the repo</a><br>
           <a class="btn btn-outline-secondary" href="https://tfarnham.github.io/cursor-tracking/" target="_blank">See a demo</a>
         </div>
@@ -121,7 +114,8 @@
       <div class="col-md-6">
         <div class="h-100 p-5 bg-light border rounded-3">
           <h2>PacMen Bouncing Around the Screen</h2>
-          <p>Creates a series of bouncing animated PacMen sprites with random trajectories</p>
+          <p>Creates a series of bouncing animated PacMen sprites with random trajectories.</p>
+          <p>Each PacMan cycles through two frames of animation, depending on whether it faces to the right or left. More can be added, and speed can be increased, but they'll never settle down.</p>
           <a class="btn btn-outline-secondary btmargin" href="https://github.com/tfarnham/pacmen-bouncing" target="_blank"">View the repo</a><br>
           <a class="btn btn-outline-secondary" href="https://tfarnham.github.io/pacmen-bouncing/" target="_blank">See a demo</a>
         </div>
@@ -132,7 +126,7 @@
 <div class="p-5 mb-4 bg-light rounded-3">
   <div class="container-fluid py-5">
     <h1 class="display-5 fw-bold">Let's keep in touch!</h1>
-    <p class="col-md-8 fs-4">Feel free to reach out, I'd love to hear from you. For web/code I'm most accessible by email: tfarnham.app@gmail.com </p>
+    <p class="col-md-8 fs-4">Feel free to reach out, I'd love to hear from you. For web matters and coding I'm most accessible by email: tfarnham.app@gmail.com </p>
     <a class="btn btn-primary btn-lg" href="mmailto:tfarnham.app@gmail.com?subject=Hello!%20I%20saw%20you%20online"_blank">Email</a>
     <a class="btn btn-primary btn-lg" href="https://www.linkedin.com/in/taylor-farnham-a3342b35" target="_blank">LinkedIn</a>
   </div>
