@@ -1,7 +1,7 @@
 # Unscrambling the Color Gradient
 Unscramble a two-dimensional grid of boxes to restore the original color gradient
 
-![Screenshot of colors](demo.png)
+<img src="demo.png" alt="Screenshot of colors" width="240"/>
 
 ## Description of the project
 This grid of colors has been scrambled, and it's your job to fix it
